@@ -8,8 +8,6 @@ import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBRangeKey
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBTable;
 
 @DynamoDBTable(tableName = "farms_diary")
-// 장훈이가 작업을 4:26분경 했음.
-// 장훈이가 2번째 작업을 4:45분경 작업을 했음.
 
 public class DailyLogDO {
     private String _id;

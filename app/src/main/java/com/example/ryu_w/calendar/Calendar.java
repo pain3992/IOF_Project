@@ -31,7 +31,7 @@ import java.util.concurrent.Executors;
 
 public class Calendar extends AppCompatActivity {
 
-    // 변수 선언   1104 GIT TEST    i added this
+    // 변수 선언
     MaterialCalendarView materialCalendarView;
     DBHelper myHelper;
     SQLiteDatabase sqlDB;
