@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    >
+
+        <TextView
+            android:id="@+id/month"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="15dp"
+            android:layout_marginTop="7dp"
+            android:textSize="36dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/year"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/month"
+            android:layout_toRightOf="@id/month"
+            android:layout_marginLeft="8dp"
+            android:layout_marginBottom="1dp"
+            android:textSize="16dp"
+            />
+        
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#cdcdcd"
+            android:layout_below="@id/month"
+            android:layout_alignLeft="@id/month"
+            android:layout_marginTop="10dp"
+            android:layout_marginRight="5dp"
+            android:id="@+id/topbar_line"
+            />
+
+        <com.prolificinteractive.materialcalendarview.MaterialCalendarView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:layout_below="@id/topbar_line"
+            android:id="@+id/calendarView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:mcv_dateTextAppearance="@style/DayfontSize"
+            app:mcv_weekDayLabels="@array/custom_weekdays"
+            app:mcv_monthLabels="@array/custom_months"
+            app:mcv_selectionColor="#a9dbf0cb"
+            app:mcv_showOtherDates="defaults" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
+            android:layout_alignParentBottom="true"
+            android:visibility="invisible"
+            android:id="@+id/sv">
+
+                <RelativeLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="150dp"
+                    android:orientation="vertical"
+                    android:background="@drawable/border">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_centerInParent="true"
+                            android:id="@+id/no_data"
+                            android:text="기록된 데이터가 없습니다."
+                            android:textSize="20sp"
+                            android:textColor="#000000"
+                            />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:id="@+id/data"
+                            android:layout_margin="8dp"
+                            android:textSize="18sp"
+                            android:textColor="#666666"/>
+
+                </RelativeLayout>
+
+        </ScrollView>
+
+        <Button
+            android:id="@+id/btn_add"
+            android:layout_width="72sp"
+            android:layout_height="72sp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="10dp"
+            android:layout_marginBottom="2dp"
+            android:background="@drawable/button" />
+
+        <Button
+            android:id="@+id/btn_edit"
+            android:layout_width="54sp"
+            android:layout_height="54sp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentBottom="true"
+            android:layout_marginRight="18dp"
+            android:layout_marginBottom="70dp"
+            android:background="@drawable/button" />
+
+        <Button
+            android:id="@+id/btn_today"
+            android:layout_width="60dp"
+            android:layout_height="50dp"
+            android:layout_alignTop="@+id/month"
+            android:layout_alignParentRight="true"
+            android:layout_marginRight="9dp"
+            android:text="오늘"
+            android:background="#00000000" />
+
+</RelativeLayout>

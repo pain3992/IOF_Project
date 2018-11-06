@@ -1,0 +1,26 @@
+{
+  "Version": "1.0",
+  "CredentialsProvider": {
+    "CognitoIdentity": {
+      "Default": {
+        "PoolId": "us-west-2:cbd83e1c-6689-4b7b-bc2c-8701dae9ef1d",
+        "Region": "us-west-2"
+      }
+    }
+  },
+  "IdentityManager": {
+    "Default": {}
+  },
+  "DynamoDBObjectMapper": {
+    "Default": {
+      "Region": "us-west-2"
+    }
+  },
+  "S3TransferUtility": {
+    "Default": {
+      "Bucket": "iof-upload",
+      "Region": "us-east-1"
+    }
+  }
+
+}

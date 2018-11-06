@@ -1,0 +1,26 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="tk_labs.settings.MainActivity">
+    <item
+        android:id="@+id/action_settings"
+        android:orderInCategory="100"
+        android:title="@string/action_settings"
+        app:showAsAction="never" />
+    <item android:id="@+id/action_toNotification"
+        android:orderInCategory="100"
+        android:title="@string/action_toNotification"
+        app:showAsAction="never"/>
+    <item
+        android:id="@+id/action_toCalendar"
+        android:orderInCategory="100"
+        android:title="@string/action_toCalendar"
+        app:showAsAction="never">
+    </item>
+    <item
+        android:id="@+id/action_toDailylog"
+        android:orderInCategory="100"
+        android:title="@string/action_toDailylog"
+        app:showAsAction="never">
+    </item>
+</menu>

@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal">
+
+    <!-- 타이틀 바 시작 -->
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="46dp"
+        android:background="#efefef"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_centerHorizontal="true"
+        android:textSize="22dp"
+        android:text="일지 작성"
+        android:id="@+id/writing"/>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#dededede"
+        android:layout_below="@id/writing"
+        android:layout_marginTop="8dp"
+        android:id="@+id/title_line"
+        />
+    <!-- 타이틀 바 끝 -->
+
+    <!-- 센서 / 날짜 선택 시작 -->
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="센서 : "
+        android:layout_below="@id/title_line"
+        android:textSize="18dp"
+        android:layout_margin="12dp"
+        android:id="@+id/tv_sensor"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="날짜 :"
+        android:layout_below="@id/title_line"
+        android:layout_alignTop="@id/tv_sensor"
+        android:textSize="18dp"
+        android:id="@+id/tv_date"
+        />
+
+    <EditText
+        android:id="@+id/et_date"
+        android:layout_width="110dp"
+        android:layout_height="wrap_content"
+        android:layout_alignBaseline="@id/tv_date"
+        android:layout_toRightOf="@id/tv_date"
+        android:ems="10"
+        android:focusableInTouchMode="true"
+        android:textSize="17dp"
+        android:windowSoftInputMode="stateAlwaysHidden" />
+
+    <Button
+        android:id="@+id/aws_load"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="3dp"
+        android:layout_marginRight="3dp"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_alignBottom="@+id/et_date"
+        android:ems="10"
+        android:background="@drawable/update_arrow"
+        android:text="새로\n고침"
+        android:textSize="10dp" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#dededede"
+        android:layout_below="@id/et_date"
+        android:layout_marginTop="8dp"
+        android:id="@+id/date_line"
+        />
+
+
+    <!-- 배터리/ 채널 시작 -->
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/battery"
+        android:layout_below="@id/date_line"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:id="@+id/battery"/>
+
+    <EditText
+        android:layout_width="65dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@id/battery"
+        android:layout_alignTop="@id/battery"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:inputType="numberDecimal"
+        android:maxLength="6"
+        android:gravity="right"
+        android:id="@+id/battery_text"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/battery_text"
+        android:layout_alignBaseline="@id/battery_text"
+        android:textSize="20dp"
+        android:text="%" />
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/channel"
+        android:layout_below="@id/date_line"
+        android:layout_toRightOf="@id/battery_text"
+        android:layout_marginLeft="45dp"
+        android:layout_marginTop="15dp"
+        android:id="@+id/channel"/>
+
+    <EditText
+        android:layout_width="65dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@id/channel"
+        android:layout_alignTop="@id/battery"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:inputType="numberDecimal"
+        android:maxLength="6"
+        android:gravity="right"
+        android:id="@+id/channel_text"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/channel_text"
+        android:layout_alignBaseline="@id/channel_text"
+        android:textSize="18dp"
+        android:text="채널" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#dddddd"
+        android:layout_below="@id/battery"
+        android:layout_marginTop="10sp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:id="@+id/weather_line"
+        />
+
+    <!-- 배터리 / 채널 끝 -->
+
+    <!-- 정보 시작 -->
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/temp"
+        android:layout_below="@id/weather_line"
+        android:layout_marginLeft="15dp"
+        android:layout_marginTop="15dp"
+        android:id="@+id/temp" />
+
+    <EditText
+        android:layout_width="65dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@id/temp"
+        android:layout_alignTop="@id/temp"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:inputType="numberDecimal"
+        android:maxLength="6"
+        android:gravity="right"
+        android:id="@+id/temp_text"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/temp_text"
+        android:layout_alignBaseline="@id/temp_text"
+        android:textSize="18dp"
+        android:text="℃" />
+
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/humid"
+        android:layout_toRightOf="@id/temp_text"
+        android:layout_alignTop="@id/temp"
+        android:layout_marginLeft="45dp"
+        android:id="@+id/humid" />
+
+    <EditText
+        android:layout_width="65dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@id/humid"
+        android:layout_alignTop="@id/temp"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:inputType="numberDecimal"
+        android:maxLength="5"
+        android:gravity="right"
+        android:id="@+id/humid_text"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/humid_text"
+        android:layout_alignBaseline="@id/humid_text"
+        android:textSize="20dp"
+        android:text="%" />
+
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/roott"
+        android:layout_below="@id/temp"
+        android:layout_alignLeft="@id/temp"
+        android:layout_marginTop="20dp"
+        android:id="@+id/rootT" />
+
+    <EditText
+        android:layout_width="65dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@id/rootT"
+        android:layout_alignTop="@id/rootT"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:inputType="numberDecimal"
+        android:maxLength="5"
+        android:gravity="right"
+        android:id="@+id/rootT_text"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/rootT_text"
+        android:layout_alignBaseline="@id/rootT_text"
+        android:textSize="18dp"
+        android:text="℃" />
+
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/co2"
+        android:layout_alignTop="@id/rootT"
+        android:layout_alignLeft="@id/humid"
+        android:id="@+id/co2" />
+
+    <EditText
+        android:layout_width="65dp"
+        android:layout_height="40dp"
+        android:layout_alignTop="@id/rootT"
+        android:layout_alignLeft="@id/humid_text"
+        android:layout_marginTop="5dp"
+        android:inputType="numberDecimal"
+        android:maxLength="6"
+        android:gravity="right"
+        android:id="@+id/co2_text"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/co2_text"
+        android:layout_alignBaseline="@id/co2_text"
+        android:textSize="18dp"
+        android:text="ppm" />
+
+    <ImageView
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        android:src="@drawable/soilt"
+        android:layout_below="@id/rootT"
+        android:layout_alignLeft="@id/temp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:id="@+id/soilT" />
+
+    <EditText
+        android:layout_width="65dp"
+        android:layout_height="40dp"
+        android:layout_toRightOf="@id/soilT"
+        android:layout_alignTop="@id/soilT"
+        android:layout_marginTop="5dp"
+        android:layout_marginLeft="10dp"
+        android:inputType="numberDecimal"
+        android:maxLength="5"
+        android:gravity="right"
+        android:id="@+id/soilT_text"/>
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/soilT_text"
+        android:layout_alignBaseline="@id/soilT_text"
+        android:textSize="18dp"
+        android:text="℃" />
+    <!-- 정보 끝 -->
+
+    <EditText
+        android:id="@+id/dailylogContent"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_below="@id/soilT"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginBottom="8dp"
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:hint="내용을 입력해 주세요"
+        android:maxLength="300"/>
+
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:layout_below="@id/dailylogContent"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:text="정보 전송"
+        android:id="@+id/btn_sendData"/>
+
+</RelativeLayout>
