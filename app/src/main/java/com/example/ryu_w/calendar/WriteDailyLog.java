@@ -39,7 +39,7 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.google.gson.Gson;
 
-public class WriteDailyLog extends AppCompatActivity {
+public class WriteDailyLog extends AppCompatActivity { //올라가ㅏ라
 
     // 변수 선언
     EditText edt_date; // 날짜 받아옴

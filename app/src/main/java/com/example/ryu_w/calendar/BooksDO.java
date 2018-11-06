@@ -8,7 +8,7 @@ import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBRangeKey
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBTable;
 
 
-
+//2018-11-06
 @DynamoDBTable(tableName = "iof-sensor-p1")
 
 public class BooksDO {
