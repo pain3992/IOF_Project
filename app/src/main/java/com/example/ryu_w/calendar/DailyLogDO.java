@@ -4,13 +4,16 @@ import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBAttribut
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBHashKey;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBIndexHashKey;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBIndexRangeKey;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBQueryExpression;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBRangeKey;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBTable;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
+import com.amazonaws.services.dynamodbv2.model.Condition;
 
 @DynamoDBTable(tableName = "farms_diary")
-
 public class DailyLogDO {
-    private String _id;
+    static private String _id;
     private String _time;
     private String _content;
     private Double _CO2;
@@ -30,7 +33,6 @@ public class DailyLogDO {
         this._id = _id;
     }
 
-
     @DynamoDBRangeKey(attributeName = "time")
     @DynamoDBAttribute(attributeName = "time")
     public String getTime() {
@@ -40,6 +42,13 @@ public class DailyLogDO {
         this._time= _time;
     }
 
+//    static Condition rangeKeyCondition = new Condition()
+//            .withComparisonOperator(ComparisonOperator.GT.toString())
+//            .withAttributeValueList(new AttributeValue().withS("1"));
+//
+//    static DynamoDBQueryExpression dbQueryExpression = new DynamoDBQueryExpression()
+//            .withHashKeyValues(_id)
+//            .withRangeKeyCondition("time", rangeKeyCondition);
 
     @DynamoDBAttribute(attributeName = "content")
     public String getContent(){
@@ -112,8 +121,8 @@ public class DailyLogDO {
     }
 
 
-//    public String toString(){
+    public String toString(){
+        return _bat+ "," + _channel + "," + _temperature + ","+ _rootT + "," + _soil + ","+_humidity + "," + _CO2 +"," + _content;
 //        return "iof[장치="+_id+",시간="+_time+",CO2="+_CO2+",BAT="+_bat+"]";
-//    }
-
+    }
 }
