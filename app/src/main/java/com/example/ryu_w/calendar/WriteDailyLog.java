@@ -67,9 +67,9 @@ public class WriteDailyLog extends AppCompatActivity implements NavigationView.O
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_dailylog);
+        setContentView(R.layout.activity_index);
 
-// (1) activity_index에서 include된 Acitivity 띄우기
+        // (1) activity_index에서 include된 Acitivity 띄우기
         ViewFlipper viewFlipper = (ViewFlipper)findViewById(R.id.viewFlipper);
         viewFlipper.setDisplayedChild(4); // ~ (1)
 
