@@ -10,6 +10,9 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.telecom.Call;
+import android.test.UiThreadTest;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,19 +22,45 @@ import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ViewFlipper;
 
+import com.amazonaws.auth.AWSCredentialsProvider;
+import com.amazonaws.mobile.client.AWSMobileClient;
+import com.amazonaws.mobile.config.AWSConfiguration;
+import com.amazonaws.mobileconnectors.dynamodbv2.document.Table;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
+import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBQueryExpression;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
+import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
+import com.amazonaws.services.dynamodbv2.model.Condition;
+import com.amazonaws.services.dynamodbv2.model.QueryRequest;
+import com.amazonaws.services.dynamodbv2.model.QueryResult;
+import com.amazonaws.services.dynamodbv2.model.ReturnConsumedCapacity;
+import com.google.common.primitives.Ints;
+import com.google.common.util.concurrent.CheckedFuture;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 import com.prolificinteractive.materialcalendarview.CalendarMode;
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView;
 import com.prolificinteractive.materialcalendarview.OnDateSelectedListener;
 import com.prolificinteractive.materialcalendarview.OnMonthChangedListener;
 
+import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 public class Calendar extends AppCompatActivity {
 
-    // 변수 선언
+    // 변수 선언   1104 GIT TEST    i added this
     MaterialCalendarView materialCalendarView;
     DBHelper myHelper;
     SQLiteDatabase sqlDB;
@@ -41,6 +70,11 @@ public class Calendar extends AppCompatActivity {
     public Cursor cursor;
     public String[] result;
     public String send_date = "";
+
+    static DynamoDBMapper dynamoDBMapper; //사용해야할 코드(1-1)!!
+
+    static List<String> date_list = new ArrayList<String>();
+    static List<String> arr_date = new ArrayList<String>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,49 +87,62 @@ public class Calendar extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        // DB 연결//
-        String dbName = "TKLabsDB";
-        String databasePath = getFilesDir().getPath() + "/" + dbName;
-        myHelper = new DBHelper(Calendar.this, databasePath, null);
-        sqlDB = myHelper.getReadableDatabase();
+        // DynamoDB 연결
+        AWSMobileClient.getInstance().initialize(this).execute();
 
-        context = this;
+        AWSCredentialsProvider credentialsProvider = AWSMobileClient.getInstance().getCredentialsProvider();
+        AWSConfiguration configuration = AWSMobileClient.getInstance().getConfiguration();
 
-        // 캘린더 만들기 //
-        materialCalendarView = (MaterialCalendarView) findViewById(R.id.calendarView);
-        materialCalendarView.setTopbarVisible(false);
+        // AmazonDynamoDBClient를 인스턴스화하는 코드 추가
+        AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient(credentialsProvider);
 
-        materialCalendarView.state().edit()
+        this.dynamoDBMapper = DynamoDBMapper.builder()
+                .dynamoDBClient(dynamoDBClient)
+                .awsConfiguration(configuration)
+                .build();
+
+        loadDailyLog();
+
+//       // DB 연결//
+//       String dbName = "TKLabsDB";
+//       String databasePath = getFilesDir().getPath() + "/" + dbName;
+//       myHelper = new DBHelper(Calendar.this, databasePath, null);
+//       sqlDB = myHelper.getReadableDatabase();
+
+         context = this;
+
+         // 캘린더 만들기 //
+         materialCalendarView = (MaterialCalendarView) findViewById(R.id.calendarView);
+         materialCalendarView.setTopbarVisible(false);
+
+         materialCalendarView.state().edit()
                 .setFirstDayOfWeek(java.util.Calendar.SUNDAY)
                 .setCalendarDisplayMode(CalendarMode.MONTHS)
                 .commit();
 
-        top_date(); // 상달 월/년 표시 함수
+         top_date(); // 상달 월/년 표시 함수
 
-        materialCalendarView.addDecorators(
+         materialCalendarView.addDecorators(
                 new SundayDecorator(),
                 new SaturdayDecorator(),
                 new onDayDecorator()
-        );
+         );
 
-        // 달 바뀔 때 위에 topBar 달,년 바뀌게 //
-        materialCalendarView.setOnMonthChangedListener(new OnMonthChangedListener() {
+         // 달 바뀔 때 위에 topBar 달,년 바뀌게 //
+         materialCalendarView.setOnMonthChangedListener(new OnMonthChangedListener() {
             @Override
             public void onMonthChanged(MaterialCalendarView widget, CalendarDay date) {
                 top_date();
             }
         });
 
-        // 캘린더 - 특정일 지정 //
-        cursor = sqlDB.rawQuery("SELECT datetime FROM plantTable;", null);;
-        final List<String> arr_date = new ArrayList<String>();
-        while(cursor.moveToNext()){
-            arr_date.add(cursor.getString(0).substring(0, 10));
-        }
-        result = new String[arr_date.size()];
-        arr_date.toArray(result);
+         // 캘린더 - 특정일 지정 //
+//      cursor = sqlDB.rawQuery("SELECT datetime FROM plantTable;", null);;
+
+//        Log.i("@@ date_list", date_list.toString());
+//        result = new String[date_list.size()];
+//        date_list.toArray(result);
         new ApiSimulator(result).executeOnExecutor(Executors.newSingleThreadExecutor());
-        cursor.moveToFirst();
 
         // 캘린더 - 클릭이벤트 //
         sv1 = (ScrollView) findViewById(R.id.sv);
@@ -124,7 +171,7 @@ public class Calendar extends AppCompatActivity {
                 }
                 if (i < result.length) { //저장한 데이터가 있을 경우
                     String s_data_view = "";
-                    for (int j = 0; j < data_view(datetime).length; j++) {
+                    for (int j = 0; j < data_view(datetime).length; j++) {  // : TODO
                         s_data_view += data_view(datetime)[j] + "\n\n";
                     }
                     tv_data.setText(s_data_view);
@@ -208,7 +255,7 @@ public class Calendar extends AppCompatActivity {
     }
 
     public String[] data_view(String date) {
-        cursor = sqlDB.rawQuery("SELECT * FROM plantTable WHERE datetime like '" + date + "%';", null);;
+        cursor = sqlDB.rawQuery("SELECT * FROM plantTable WHERE datetime like '" + date + "%';", null);;  // :TODO
         final List<String> arr_data = new ArrayList<String>();
         while(cursor.moveToNext()){
             arr_data.add("기온 : " + cursor.getString(3) + "℃  뿌리 온도 : " + cursor.getString(4) + "℃\n습도 : " +
@@ -293,4 +340,56 @@ public class Calendar extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
+
+    public void loadDailyLog()  {
+
+        Condition rangeKeyCondition = new Condition()   // 쿼리 검색 조건 설정
+                .withComparisonOperator(ComparisonOperator.GT)
+                .withAttributeValueList(new AttributeValue().withS("1"));
+
+        DailyLogDO dailylogKey = new DailyLogDO();  // 쿼리 검색 해쉬 값 설정
+        dailylogKey.setId("sensor_p1");
+
+        final DynamoDBQueryExpression<DailyLogDO> queryExpression = new DynamoDBQueryExpression<DailyLogDO>()   // 쿼리식 작성
+                .withHashKeyValues(dailylogKey)
+                .withRangeKeyCondition("time", rangeKeyCondition);
+
+        // ------------------------------------------------------------    Callable
+
+        ExecutorService exec = Executors.newSingleThreadExecutor();
+        List<Future<List<String>>> list = new ArrayList<Future<List<String>>>();
+        Future<List<String>> future = exec.submit(new Callable<List<String>>() {
+            @Override
+            public List<String> call() throws Exception {
+                try {
+                    List<DailyLogDO> save_date = dynamoDBMapper.query(DailyLogDO.class, queryExpression);
+                    int i = 0;
+                    while (i < save_date.size()) {
+                        date_list.add(save_date.get(i).getTime());
+                        i++;
+                    }
+                    result = new String[date_list.size()];
+                } catch (Exception e) {
+                    Log.e("error", e.getMessage());
+                }
+                return date_list;
+            }
+
+        });
+
+        list.add(future);
+
+        for(Future<List<String>> fut : list){
+            try{
+                String str_result = (fut.get().toString());
+                str_result = str_result.substring(1,str_result.length()-1);
+                result = str_result.split(", ");
+            } catch (InterruptedException | ExecutionException e){
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
+
+

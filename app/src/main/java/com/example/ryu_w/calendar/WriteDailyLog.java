@@ -14,6 +14,7 @@ import android.text.Spannable;
 import android.text.SpannableStringBuilder;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -39,12 +40,17 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.google.gson.Gson;
 
-public class WriteDailyLog extends AppCompatActivity { //올라가ㅏ라
+import java.util.List;
+
+import static java.sql.Types.NULL;
+
+public class WriteDailyLog extends AppCompatActivity {
 
     // 변수 선언
     EditText edt_date; // 날짜 받아옴
     TextView tv_sensor; // 센서 TextView
     float battery, channel, temp, rootT, humid, co2, soil; // DB에 넣을 자료형 변환
+    String receive_date;
     DBHelper myHelper; // DB연결
     SQLiteDatabase sqlDB;
 
@@ -90,7 +96,7 @@ public class WriteDailyLog extends AppCompatActivity { //올라가ㅏ라
 
         // Intent로 넘긴 날짜 값 저장
         inIntent = getIntent(); //Main에서 넘긴 날짜 값 받아옴
-        String receive_date = inIntent.getStringExtra("send_date");
+        receive_date = inIntent.getStringExtra("send_date");
         if (TextUtils.isEmpty(receive_date)) { // 선택한 날짜 없으면 오늘 날짜 저장
             receive_date = cYear + "-" +
                     (cMonth > 8 ? (cMonth + 1) : "0" + (cMonth + 1)) + "-" +
@@ -116,13 +122,17 @@ public class WriteDailyLog extends AppCompatActivity { //올라가ㅏ라
                 .build();
 
         awsLoad = (Button) findViewById(R.id.aws_load);
-        Runnable runnable = new Runnable() { // DDB 비동기 호출
-            public void run() {
-            queryBook();
-            }
-        };
-        Thread mythread = new Thread(runnable);
-        mythread.start();
+
+        // 데이터 읽어오기
+        loadDailyLog();
+
+//            Runnable runnable = new Runnable() { // DDB 비동기 호출
+//                public void run() {
+//                    queryBook();
+//                }
+//            };
+//            Thread mythread = new Thread(runnable);
+//            mythread.start();
 
         // 업데이트 버튼 클릭 시
         awsLoad.setOnClickListener(new View.OnClickListener() { // 버튼을 눌러 쿼리를 수행하는 부분!!
@@ -133,39 +143,12 @@ public class WriteDailyLog extends AppCompatActivity { //올라가ㅏ라
                 anim.setDuration(2000); //2초간 지속.
                 awsLoad.startAnimation(anim);
 
-                Runnable runnable = new Runnable() { //DDB 비동기 호출
-                    public void run() {
-                        queryBook();
-                    }
-                };
-                Thread mythread = new Thread(runnable);
-                mythread.start();
-
-                new Handler().postDelayed(new Runnable() {
+                new Thread(new Runnable() {//DDB 비동기 호출
                     @Override
                     public void run() {
-                        awsLoad.setText("새로\n고침");
-                    }
-                }, 2000);
-            }
-        });
-
-        // 업데이트 버튼 클릭 시
-        awsLoad.setOnClickListener(new View.OnClickListener() { // 버튼을 눌러 쿼리를 수행하는 부분!!
-            @Override
-            public void onClick(View view) {  // 비동기 호출
-                awsLoad.setText(" ");
-                RotateAnimation anim = new RotateAnimation(0, 720, 58.5f, 58.5f); // 빙글빙글 애니메이션.
-                anim.setDuration(2000); //2초간 지속.
-                awsLoad.startAnimation(anim);
-
-                Runnable runnable = new Runnable() { //DDB 비동기 호출
-                    public void run() {
                         queryBook();
                     }
-                };
-                Thread mythread = new Thread(runnable);
-                mythread.start();
+                }).start();
 
                 new Handler().postDelayed(new Runnable() {
                     @Override
@@ -181,9 +164,8 @@ public class WriteDailyLog extends AppCompatActivity { //올라가ㅏ라
         btn_SendData.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                String date = edt_date.getText().toString();
-
                 // editText -> String형 변환
+                String date = edt_date.getText().toString();
                 String s_battery = edt_BatteryText.getText().toString();
                 String s_channel = edt_ChannelText.getText().toString();
                 String s_temp = edt_TempText.getText().toString();
@@ -201,41 +183,39 @@ public class WriteDailyLog extends AppCompatActivity { //올라가ㅏ라
                     co2 = Float.parseFloat(s_co2);
                     soil = Float.parseFloat(s_soil);
 
-                    String dbName = "TKLabsDB";
-                    String databasePath = getFilesDir().getPath() + "/" + dbName;
-                    myHelper = new DBHelper(WriteDailyLog.this, databasePath, null);
-                    sqlDB = myHelper.getWritableDatabase();
-                    sqlDB.execSQL("INSERT INTO plantTable VALUES ('" + date + "', " + battery + "," + channel + "," + temp + ", " + rootT + ", " + humid + ", " + co2 + "," + soil + ");");
-                    sqlDB.close();
+                    // 내장 DB로 쓸 때 코드
+//                    String dbName = "TKLabsDB";
+//                    String databasePath = getFilesDir().getPath() + "/" + dbName;
+//                    myHelper = new DBHelper(WriteDailyLog.this, databasePath, null);
+//                    sqlDB = myHelper.getWritableDatabase();
+//                    sqlDB.execSQL("INSERT INTO plantTable VALUES ('" + date + "', " + battery + "," + channel + "," + temp + ", " + rootT + ", " + humid + ", " + co2 + "," + soil + ");");
+//                    sqlDB.close();
 
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            createDailyLog();
+                        }
+                    }).start();
 
-
-
+                    // dynamoDB 작성
                     outIntent = new Intent(getApplicationContext(), Calendar.class);
                     setResult(RESULT_OK, outIntent);
                     finish(); //일지작성 레이아웃 닫음
                     // startActivity(outIntent); // 메인 액티비티 재실행
                     Toast.makeText(getApplicationContext(), "입력되었습니다.", Toast.LENGTH_SHORT).show();
+
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "모든 값을 입력 해 주세요", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getApplicationContext(), "입력 실패. 모든 값을 입력 해 주세요", Toast.LENGTH_SHORT).show();
                 }
 
-
-                try {
-                    Runnable runnable = new Runnable() { //DDB 비동기 호출
-                        public void run() {
-                            createDailyLog();
-                        }
-                    };
-                    Thread mythread = new Thread(runnable);
-                    mythread.start();
-
-                    Toast.makeText(getApplicationContext(), "다이나모 DB 입력 완료", Toast.LENGTH_LONG).show();
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    Toast.makeText(getApplicationContext(), "다이나모 DB 입력 실패", Toast.LENGTH_SHORT).show();
-                }
+//                try {
+//                    // 다이나모 있던 자리
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    Toast.makeText(getApplicationContext(), "다이나모 DB 입력 실패", Toast.LENGTH_SHORT).show();
+//                }
             }
         });
 
@@ -271,9 +251,8 @@ public class WriteDailyLog extends AppCompatActivity { //올라가ㅏ라
             public void run() {
                 com.example.ryu_w.calendar.BooksDO book = new com.example.ryu_w.calendar.BooksDO(); //패키지 안의 클래스를 불러오는 과정 (경로 변경시키기)
                 //book.setId(edtNum.getText().toString());       //partition key (테이블에서 'dev_id'가 해당되는 부분입니다)
-                book.setId("sensor_p1");                       // TODO : 일단 고정 시켜놨어요.
+                book.setId("sensor_p1");                       // 일단 고정 시켜놨어요.
                 book.setTime(edt_date.getText().toString()); //range key (테이블에서 'time'이 해당되는 부분입니다)
-
 
                 Condition rangeKeyCondition = new Condition()
                         .withComparisonOperator(ComparisonOperator.BEGINS_WITH)
@@ -319,7 +298,6 @@ public class WriteDailyLog extends AppCompatActivity { //올라가ㅏ라
     // 뒤로가기 버튼 : 출처 : http://ccdev.tistory.com/12
     @Override
     public void onBackPressed() {
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);     // 여기서 this는 Activity의 this
 
         // 여기서 부터는 알림창의 속성 설정
@@ -342,8 +320,8 @@ public class WriteDailyLog extends AppCompatActivity { //올라가ㅏ라
         AlertDialog dialog = builder.create();    // 알림창 객체 생성
         dialog.show();    // 알림창 띄우기
     }
-    
-    // 11-06 Janghun Works : 다이나모 DB에 넣는 코드
+
+    // 11-05 Janghun Works : 다이나모 DB에 넣는 코드
     public void createDailyLog() {
         String date = edt_date.getText().toString();
         String s_content = edt_ContentText.getText().toString();
@@ -357,7 +335,7 @@ public class WriteDailyLog extends AppCompatActivity { //올라가ㅏ라
 
         final com.example.ryu_w.calendar.DailyLogDO dailyLogItem = new com.example.ryu_w.calendar.DailyLogDO();
 
-        dailyLogItem.setId("1106 test"); //sensor_p1 고정
+        dailyLogItem.setId("sensor_p1"); //sensor_p1 고정
 
         // 날짜
         dailyLogItem.setTime(date);
@@ -373,6 +351,8 @@ public class WriteDailyLog extends AppCompatActivity { //올라가ㅏ라
         dailyLogItem.sethumi(d_humid);
         // 뿌리온도
         dailyLogItem.setrootT(d_rootT);
+        // 토양온도
+        dailyLogItem.setsoil(d_soil);
         // 온도
         dailyLogItem.settemp(d_temp);
 
@@ -381,9 +361,48 @@ public class WriteDailyLog extends AppCompatActivity { //올라가ㅏ라
             public void run() {
                 dynamoDBMapper.save(dailyLogItem);
                 // Item saved
-
             }
         }).start();
+    }
+
+    public void loadDailyLog() {
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() { // 저장한거 있으면 저장한거 불러옴
+                DailyLogDO DailyLogItem = dynamoDBMapper.load(
+                        DailyLogDO.class,
+                        "sensor_p1", receive_date);
+                if (DailyLogItem == null){  // 저장한 거 없으면  새로 받아옴
+                    queryBook();
+                } else {    // 저장한게 있어서 불러왔으면.
+                    String [] save_data = DailyLogItem.toString().split(",", -1);
+                    edt_BatteryText.setText(save_data[0]); // battery
+                    edt_ChannelText.setText(save_data[1]); // channel
+                    edt_TempText.setText(save_data[2]);    // temp
+                    edt_RootTText.setText(save_data[3]);   // rootT
+                    edt_SoilTText.setText(save_data[4]);   // soil
+                    edt_HumidText.setText(save_data[5]);   // humidity
+                    edt_Co2Text.setText(save_data[6]);     // CO2
+                    if( !"null".equals(save_data[7])) {    // 코멘트 있으면 출력. 없으면 null 이라고 떠서 예외처리.
+                        edt_ContentText.setText(save_data[7].toString()); // Content
+                    }
+                    btn_SendData.setText("수정 정보 전송");
+                }
+            }
+        }).start();
+
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//
+//                runOnUiThread(new Runnable() {  // Item read
+//                    @Override
+//                    public void run() {
+//                        edt_TempText.setText(dailyLogItem.toString());
+//                    }
+//                });
+//            }
     }
 
     @Override
