@@ -7,6 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -40,11 +44,9 @@ import com.amazonaws.services.dynamodbv2.model.ComparisonOperator;
 import com.amazonaws.services.dynamodbv2.model.Condition;
 import com.google.gson.Gson;
 
-import java.util.List;
 
-import static java.sql.Types.NULL;
+public class WriteDailyLog extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener { //올라가ㅏ라
 
-public class WriteDailyLog extends AppCompatActivity {
 
     // 변수 선언
     EditText edt_date; // 날짜 받아옴
@@ -67,11 +69,22 @@ public class WriteDailyLog extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dailylog);
 
-//        ViewFlipper vf = (ViewFlipper)findViewById(R.id.vf);
-//        vf.setDisplayedChild(3);
+// (1) activity_index에서 include된 Acitivity 띄우기
+        ViewFlipper viewFlipper = (ViewFlipper)findViewById(R.id.viewFlipper);
+        viewFlipper.setDisplayedChild(4); // ~ (1)
 
+        // (2) Navigation_drawer Activity에 필요한 메뉴바 띄우기
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this); // ~ (2)
 
         edt_BatteryText = (EditText) findViewById(R.id.battery_text);
         edt_ChannelText = (EditText) findViewById(R.id.channel_text);
@@ -251,7 +264,9 @@ public class WriteDailyLog extends AppCompatActivity {
             public void run() {
                 com.example.ryu_w.calendar.BooksDO book = new com.example.ryu_w.calendar.BooksDO(); //패키지 안의 클래스를 불러오는 과정 (경로 변경시키기)
                 //book.setId(edtNum.getText().toString());       //partition key (테이블에서 'dev_id'가 해당되는 부분입니다)
+
                 book.setId("sensor_p1");                       // 일단 고정 시켜놨어요.
+
                 book.setTime(edt_date.getText().toString()); //range key (테이블에서 'time'이 해당되는 부분입니다)
 
                 Condition rangeKeyCondition = new Condition()
@@ -408,7 +423,7 @@ public class WriteDailyLog extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu); //
+        getMenuInflater().inflate(R.menu.nav_temp, menu);
         return true;
     }
 
@@ -418,19 +433,38 @@ public class WriteDailyLog extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        ViewFlipper vf = (ViewFlipper) findViewById(R.id.vf);
 
+        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.action_toNotification) {
-            Intent intent = new Intent(getApplicationContext(), Notification.class);
-            startActivity(intent);
-        } else if (id == R.id.action_toCalendar) {
-            Intent intent = new Intent(getApplicationContext(), Calendar.class);
-            startActivity(intent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_setting) {
+            Intent intent = new Intent(getApplicationContext(), Farm_Setting.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_notification) {
+            Intent intent = new Intent(getApplicationContext(), Notification.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_calendar) {
+            Intent intent = new Intent(getApplicationContext(), Calendar.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 }

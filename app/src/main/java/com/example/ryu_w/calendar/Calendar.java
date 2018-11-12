@@ -7,6 +7,10 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -58,7 +62,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-public class Calendar extends AppCompatActivity {
+public class Calendar extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     // 변수 선언   1104 GIT TEST    i added this
     MaterialCalendarView materialCalendarView;
@@ -79,13 +83,16 @@ public class Calendar extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_calendar);
+        setContentView(R.layout.activity_index);
 
-//        ViewFlipper vf = (ViewFlipper)findViewById(R.id.vf);
-//        vf.setDisplayedChild(2);
+        // (1) activity_index에서 include된 Acitivity 띄우기
+        ViewFlipper viewFlipper = (ViewFlipper)findViewById(R.id.viewFlipper);
+        viewFlipper.setDisplayedChild(3); // ~ (1)
 
+        // (2) Navigation_drawer Activity에 필요한 메뉴바 띄우기
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
 
         // DynamoDB 연결
         AWSMobileClient.getInstance().initialize(this).execute();
@@ -95,6 +102,16 @@ public class Calendar extends AppCompatActivity {
 
         // AmazonDynamoDBClient를 인스턴스화하는 코드 추가
         AmazonDynamoDBClient dynamoDBClient = new AmazonDynamoDBClient(credentialsProvider);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this); // ~ (2)
+
 
         this.dynamoDBMapper = DynamoDBMapper.builder()
                 .dynamoDBClient(dynamoDBClient)
@@ -315,7 +332,7 @@ public class Calendar extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu); //
+        getMenuInflater().inflate(R.menu.nav_temp, menu);
         return true;
     }
 
@@ -325,20 +342,39 @@ public class Calendar extends AppCompatActivity {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        ViewFlipper vf = (ViewFlipper) findViewById(R.id.vf);
 
+        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.action_toNotification) {
-            Intent intent = new Intent(getApplicationContext(), Notification.class);
-            startActivity(intent);
-        } else if (id == R.id.action_toDailylog) {
-            Intent intent = new Intent(getApplicationContext(), WriteDailyLog.class);
-            startActivity(intent);
+            return true;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_setting) {
+            Intent intent = new Intent(getApplicationContext(), Farm_Setting.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_notification) {
+            Intent intent = new Intent(getApplicationContext(), Notification.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_calendar) {
+            Intent intent = new Intent(getApplicationContext(), Calendar.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     public void loadDailyLog()  {

@@ -60,6 +60,12 @@
     <string name="min_value">최저</string>
     <string name="value">값</string>
     <string name="title_activity_setting">Setting</string>
+    <string name="title_activity_nav_temp">nav_temp</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
     <!-- 장훈 Works -->
 
 </resources>

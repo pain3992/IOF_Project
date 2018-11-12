@@ -4,12 +4,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".Index">
 
     <android.support.design.widget.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
         android:theme="@style/AppBarOverlay">
 
         <android.support.v7.widget.Toolbar
@@ -22,33 +21,31 @@
     </android.support.design.widget.AppBarLayout>
 
     <ViewFlipper xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/vf"
+        android:id="@+id/viewFlipper"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content" >
         <include
             android:id="@+id/layout_1"
             android:visibility="visible"
-            layout="@layout/content_setting" />
+            layout="@layout/content_nav_temp" />
         <include
             android:id="@+id/layout_2"
             android:visibility="gone"
-            layout="@layout/activity_notification" />
+            layout="@layout/activity_setting" />
         <include
             android:id="@+id/layout_3"
             android:visibility="gone"
-            layout="@layout/activity_calendar" />
+            layout="@layout/activity_notification" />
         <include
             android:id="@+id/layout_4"
             android:visibility="gone"
+            layout="@layout/activity_calendar" />
+        <include
+            android:id="@+id/layout_5"
+            android:visibility="gone"
             layout="@layout/activity_dailylog" />
     </ViewFlipper>
+    <!--<include layout="@layout/content_nav_temp" />-->
 
-    <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:layout_margin="@dimen/fab_margin"
-        app:srcCompat="@android:drawable/ic_dialog_email" />
 
 </android.support.design.widget.CoordinatorLayout>

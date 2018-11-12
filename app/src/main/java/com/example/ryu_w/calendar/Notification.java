@@ -1,10 +1,13 @@
 package com.example.ryu_w.calendar;
 
 import android.content.Intent;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,7 +22,7 @@ import com.amazonaws.mobile.config.AWSConfiguration;
 import com.amazonaws.mobileconnectors.dynamodbv2.dynamodbmapper.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 
-public class Notification extends AppCompatActivity {
+public class Notification extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener{
     EditText H_temp,L_temp,H_humi,L_humi,H_CO2,L_CO2,H_rootT,L_rootT,H_soil,L_soil;
     Button setting_save;
 
@@ -28,7 +31,25 @@ public class Notification extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activity_index);
+
+        // (1) activity_index에서 include된 Acitivity 띄우기
+        ViewFlipper viewFlipper = (ViewFlipper)findViewById(R.id.viewFlipper);
+        viewFlipper.setDisplayedChild(2);
+
+        // (2) Navigation_drawer Activity에 필요한 메뉴바 띄우기
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.addDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this); // ~ (2)
+
 
         // AWSMobileClient enables AWS user credentials to access your table
         AWSMobileClient.getInstance().initialize(this).execute(); // USED
@@ -45,12 +66,6 @@ public class Notification extends AppCompatActivity {
                 .awsConfiguration(configuration)
                 .build();
         // other activity code ...
-
-        ViewFlipper vf = (ViewFlipper)findViewById(R.id.vf);
-        vf.setDisplayedChild(1);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
 
         H_temp = (EditText) findViewById(R.id.H_temp);
         L_temp = (EditText) findViewById(R.id.L_temp);
@@ -80,35 +95,35 @@ public class Notification extends AppCompatActivity {
             }
         });
     }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-        ViewFlipper vf = (ViewFlipper) findViewById(R.id.vf);
-
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.action_toCalendar) {
-            Intent intent = new Intent(getApplicationContext(), Calendar.class);
-            startActivity(intent);
-        } else if (id == R.id.action_toDailylog) {
-            Intent intent = new Intent(getApplicationContext(), WriteDailyLog.class);
-            startActivity(intent);
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
+//
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        // Inflate the menu; this adds items to the action bar if it is present.
+//        getMenuInflater().inflate(R.menu.menu_main, menu);
+//        return true;
+//    }
+//
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        // Handle action bar item clicks here. The action bar will
+//        // automatically handle clicks on the Home/Up button, so long
+//        // as you specify a parent activity in AndroidManifest.xml.
+//        int id = item.getItemId();
+//        ViewFlipper vf = (ViewFlipper) findViewById(R.id.vf);
+//
+//        if (id == R.id.action_settings) {
+//            Intent intent = new Intent(getApplicationContext(), Farm_Setting.class);
+//            startActivity(intent);
+//        } else if (id == R.id.action_toCalendar) {
+//            Intent intent = new Intent(getApplicationContext(), Calendar.class);
+//            startActivity(intent);
+//        } else if (id == R.id.action_toDailylog) {
+//            Intent intent = new Intent(getApplicationContext(), WriteDailyLog.class);
+//            startActivity(intent);
+//        }
+//
+//        return super.onOptionsItemSelected(item);
+//    }
 
     public void createNotification() {
         final com.example.ryu_w.calendar.notificationDO notificationItem = new  com.example.ryu_w.calendar.notificationDO();
@@ -145,4 +160,63 @@ public class Notification extends AppCompatActivity {
             }
         }).start();
     }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.nav_temp, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_setting) {
+            Intent intent = new Intent(getApplicationContext(), Farm_Setting.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_notification) {
+            Intent intent = new Intent(getApplicationContext(), Notification.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_calendar) {
+            Intent intent = new Intent(getApplicationContext(), Calendar.class);
+            startActivity(intent);
+        } else if (id == R.id.nav_share) {
+
+        } else if (id == R.id.nav_send) {
+
+        }
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
 }
+
